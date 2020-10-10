@@ -1,0 +1,79 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: dyson
+packageMetadata:
+  tags:
+  - kpt.dev/app=dyson
+  shortDescription: kpt Dyson package
+openAPI:
+  definitions:
+    io.k8s.cli.substitutions.app-name:
+      x-k8s-cli:
+        substitution:
+          name: app-name
+          pattern: ${APP_NAME}-app
+          values:
+          - marker: ${APP_NAME}
+            ref: '#/definitions/io.k8s.cli.setters.APP_NAME'
+    io.k8s.cli.substitutions.hpa-name:
+      x-k8s-cli:
+        substitution:
+          name: hpa-name
+          pattern: ${APP_NAME}-hpa
+          values:
+          - marker: ${APP_NAME}
+            ref: '#/definitions/io.k8s.cli.setters.APP_NAME'
+    io.k8s.cli.setters.APP_NAME:
+      x-k8s-cli:
+        setter:
+          name: APP_NAME
+          value: dyson-taxi
+          isSet: true
+          required: true
+    io.k8s.cli.substitutions.topic:
+      x-k8s-cli:
+        substitution:
+          name: topic
+          pattern: ${TOPIC}
+          values:
+          - marker: ${TOPIC}
+            ref: '#/definitions/io.k8s.cli.setters.TOPIC'
+    io.k8s.cli.setters.TOPIC:
+      x-k8s-cli:
+        setter:
+          name: TOPIC
+          value: projects/pubsub-public-data/topics/taxirides-realtime
+          isSet: true
+          required: true
+    io.k8s.cli.substitutions.service-name:
+      x-k8s-cli:
+        substitution:
+          name: service-name
+          pattern: ${APP_NAME}-service
+          values:
+          - marker: ${APP_NAME}
+            ref: '#/definitions/io.k8s.cli.setters.APP_NAME'
+    io.k8s.cli.substitutions.project-id-sa:
+      x-k8s-cli:
+        substitution:
+          name: project-id-sa
+          pattern: dyson-sa@${PROJECT_ID}.iam.gserviceaccount.com
+          values:
+          - marker: ${PROJECT_ID}
+            ref: '#/definitions/io.k8s.cli.setters.PROJECT_ID'
+    io.k8s.cli.setters.PROJECT_ID:
+      x-k8s-cli:
+        setter:
+          name: PROJECT_ID
+          value: jdnz-dyson5
+          isSet: true
+          required: true
+    io.k8s.cli.substitutions.project-id-image:
+      x-k8s-cli:
+        substitution:
+          name: project-id-image
+          pattern: gcr.io/${PROJECT_ID}/dyson:latest
+          values:
+          - marker: ${PROJECT_ID}
+            ref: '#/definitions/io.k8s.cli.setters.PROJECT_ID'

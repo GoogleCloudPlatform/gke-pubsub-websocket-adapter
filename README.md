@@ -51,7 +51,7 @@ Currently, the `gke-pubsub-websocket-adapter` uses WebSockets in half-duplex and
 the publishing of messages by clients over the same WebSocket connection.
 
 
-## ![Architecture](autosocket-architecture.svg "Architecture")
+## ![Architecture](architecture.svg "Architecture")
 
 The `gke-pubsub-websocket-adapter`'s architecture consists of a number of underlying
 components that work in concert to distribute Pub/Sub messages over

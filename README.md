@@ -93,8 +93,7 @@ For the default deploy, these variables are set for you in the `cloudbuild.yaml`
 * If you visit the cluster on the HTTP port instead of the WS/S port,
   you will be presented with the `websocketd` diagnostic
   page. Clicking on the checkbox will allow you to see the Pub/Sub
-  messages coming through the WebSocket in the browser. This
-  functionality can be removed by removing the `--devconsole` argument from the `websocketd` call in the [container setup's](https://github.com/GoogleCloudPlatform/gke-pubsub-websocket-adapter/blob/main/container/exec.sh) `exec.sh` file.
+  messages coming through the WebSocket in the browser. This can be disabled by removing the `--devconsole` argument from the `websocketd` call in the [container setup's](https://github.com/GoogleCloudPlatform/gke-pubsub-websocket-adapter/blob/main/container/exec.sh) `exec.sh` file.
 
 ## See also
 

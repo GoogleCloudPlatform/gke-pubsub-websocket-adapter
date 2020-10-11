@@ -74,7 +74,7 @@ deploy the `gke-pubsub-websocket-adapter` in. After that you can run `sh deploy.
 
 ### Authentication
 
-The `gke-pubsub-websocket-adapter` uses [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) to authenticate with Pub/Sub under the Google service account called `autosocket-sa`. If you are wanting to use a private Pub/Sub topic this service account will require access to the topic. 
+The `gke-pubsub-websocket-adapter` uses [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) to authenticate with Pub/Sub under the Google service account called `dyson-sa`. If you are wanting to use a private Pub/Sub topic this service account will require access to the topic. 
 
 
 ## Configuration

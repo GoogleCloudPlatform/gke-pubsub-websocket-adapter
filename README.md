@@ -85,7 +85,7 @@ You can see the variables that can be set by running `kpt cfg list-setters .` fr
 
 For the default deploy, these variables are set for you in the `cloudbuild.yaml` file. If you would like to pass through a different topic for the example you can so by passing [substitution variables](https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values) into Cloudbuild. 
 
- `gcloud builds submit --config cloudbuild.yaml --substitutions=_AUTOSOCKET_APP_NAME="demo-app",_AUTOSOCKET_TOPIC="projects/sample/topic"`
+ `gcloud builds submit --config cloudbuild.yaml --substitutions=_DYSON_APP_NAME="demo-app",_DYSON_APP_NAME="projects/sample/topic"`
 
 
 ## Known issues and enhancements

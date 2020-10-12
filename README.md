@@ -65,8 +65,8 @@ WebSockets. These include:
 
 ### Deployment
 
-* [Cloud Build]()
-* [Terraform]()
+* [Cloud Build](https://github.com/GoogleCloudPlatform/gke-pubsub-websocket-adapter/blob/main/cloudbuild.yaml)
+* [Terraform](https://github.com/GoogleCloudPlatform/gke-pubsub-websocket-adapter/blob/main/setup/main.tf)
 
 To deploy the `gke-pubsub-websocket-adapter` ensure you have set
 `gcloud config set project sample-project` to the project you wish to

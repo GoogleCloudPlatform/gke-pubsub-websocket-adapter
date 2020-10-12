@@ -94,6 +94,8 @@ For the default deploy, these variables are set for you in the `cloudbuild.yaml`
   you will be presented with the `websocketd` diagnostic
   page. Clicking on the checkbox will allow you to see the Pub/Sub
   messages coming through the WebSocket in the browser. This can be disabled by removing the `--devconsole` argument from the `websocketd` call in the [container setup's](https://github.com/GoogleCloudPlatform/gke-pubsub-websocket-adapter/blob/main/container/exec.sh) `exec.sh` file.
+  
+* If you would like to secure your websockets with TLS to support _wss_ (_WebSocket_ Secure) you can follow [this documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs) or if you would like to leverage Google-managed certificates you can use the following [documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs).
 
 ## See also
 

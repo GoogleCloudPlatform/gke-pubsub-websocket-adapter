@@ -60,7 +60,7 @@ WebSockets. These include:
 ### Runtime
 
 * [`websocketd`](http://websocketd.com/) CLI for serving websocket clients
-* [`pulltop`](./pulltop/pulltop.js) CLI for Pub/Sub subscription management
+* [`pulltop`](https://github.com/GoogleCloudPlatform/pulltop) CLI for Pub/Sub subscription management
 * [GKE](https://cloud.google.com/kubernetes-engine)
 
 ### Deployment

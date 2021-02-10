@@ -1,44 +1,37 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 timeout: 10800s
 substitutions:
-  _DYSON_APP_NAME: "dyson-taxi"
-  _DYSON_TOPIC: "projects/pubsub-public-data/topics/taxirides-realtime"
+  _PUBSUB_TOPIC: projects/pubsub-public-data/topics/taxirides-realtime # default value
+  _CONTAINER_LOCATION: gcr.io/gcp-autosocket/dyson:latest # default value
 steps:
-  # [Set project Id throughout the repo]
-- name: gcr.io/kpt-dev/kpt:latest
-  id: "Set Project ID"
-  args: ['cfg', 'set', '.', 'PROJECT_ID', '${PROJECT_ID}']
-
-  # [Set the Pub/Sub topic to use
-- name: gcr.io/kpt-dev/kpt:latest
-  id: "Set Pub/Sub Topic"
-  args: ['cfg', 'set', '.', 'TOPIC', '${_DYSON_TOPIC}']
-
-  # [Set the name of the app to be deployed into GKE]
-- name: gcr.io/kpt-dev/kpt:latest
-  id: "Set App Name"
-  args: ['cfg', 'set', '.', 'APP_NAME', '${_DYSON_APP_NAME}']
-
-  # [Kick off Terraform deployment]
-- name: "gcr.io/cloud-builders/gcloud"
-  id: "deploy-cluster"
-  dir: "setup"
-  args:
-  - "builds"
-  - "submit"
-  
   # [Build Dyson Container Image]
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/dyson:latest','.']
+  id: "Build Dyson Container"
+  args: ['build', '-t', '${_CONTAINER_LOCATION}','.']
 
   # [Push Container Image to gcr]
 - name: 'gcr.io/cloud-builders/docker'
-  args: ["push", "gcr.io/$PROJECT_ID/dyson:latest",]
+  id: "Push Dyson Container"
+  args: ['push', '${_CONTAINER_LOCATION}']
 
-  # [Deploy dyson manifests to GKE]
-- name: 'gcr.io/cloud-builders/kubectl'
-  waitFor:
-    - deploy-cluster
-  args: ['apply', '-f', './kubernetes/']
-  env:
-  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-f'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=dyson-cluster'
+  # [Kick off Terraform deployment]
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "Run Terraform"
+  dir: "terraform"
+  args:
+  - "builds"
+  - "submit"
+  - "--substitutions=_CONTAINER_LOCATION=${_CONTAINER_LOCATION},_PUBSUB_TOPIC=${_PUBSUB_TOPIC}"

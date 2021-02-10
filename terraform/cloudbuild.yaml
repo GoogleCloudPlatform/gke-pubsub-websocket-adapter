@@ -13,6 +13,9 @@
 # limitations under the License.
 
 timeout: 10800s
+substitutions:
+  _PUBSUB_TOPIC: projects/pubsub-public-data/topics/taxirides-realtime # default value
+  _CONTAINER_LOCATION: gcr.io/jdnz-dyson-terraform1/dyson:latest # default value
 steps:
   ###
   # Create GCS bucket to store terraform state
@@ -24,32 +27,32 @@ steps:
       - "-xe"
       - "-c"
       - |
-        gsutil mb gs://${PROJECT_ID}-dyson-tf-state || true
+        gsutil mb gs://$PROJECT_ID-dyson-tf-state || true
     waitFor: ["-"]
 # Initialize backend and select workspace    
   - id: "tf init"
-    name: "hashicorp/terraform:0.13.1"
+    name: "hashicorp/terraform:0.14.6"
     entrypoint: 'sh'
     args: 
     - '-c'
     - | 
-      terraform init -upgrade=true -input=false -backend-config="bucket=${PROJECT_ID}-dyson-tf-state" || true
+      terraform init -upgrade=true -input=false -backend-config="bucket=$PROJECT_ID-dyson-tf-state" || true
 # [START tf-plan]
   - id: 'tf plan'
-    name: 'hashicorp/terraform:0.13.1'
+    name: 'hashicorp/terraform:0.14.6'
     entrypoint: 'sh'
     args: 
     - '-c'
     - | 
-      terraform plan -out terraform.tfplan -var="project=${PROJECT_ID}" -var="region=us-central1" -var="zone=us-central1-f"
+      terraform plan -out terraform.tfplan -input=false -var="project=$PROJECT_ID" -var="region=us-central1" -var="container_location=${_CONTAINER_LOCATION}" -var="topic=${_PUBSUB_TOPIC}"
 # [END tf-plan]
 
 # [START tf-apply]
   - id: 'tf apply'
-    name: 'hashicorp/terraform:0.13.1'
+    name: 'hashicorp/terraform:0.14.6'
     entrypoint: 'sh'
     args: 
     - '-c'
     - | 
       terraform apply -input=false terraform.tfplan
-# [END tf-apply]  
+# [END tf-apply]

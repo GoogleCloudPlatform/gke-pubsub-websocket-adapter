@@ -1,3 +1,5 @@
+#!/bin/bash
+
 while getopts c:t:p: flag
 do
     case "${flag}" in
@@ -10,7 +12,8 @@ done
 if [[ ! -z "$project" ]]
 then
     export PROJECT_ID=$project
-elses
+    gcloud config set project $project
+else
     export PROJECT_ID=$(gcloud config get-value project)
 fi
 

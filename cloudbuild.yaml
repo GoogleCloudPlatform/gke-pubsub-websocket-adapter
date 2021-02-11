@@ -15,7 +15,7 @@
 timeout: 10800s
 substitutions:
   _PUBSUB_TOPIC: projects/pubsub-public-data/topics/taxirides-realtime # default value
-  _CONTAINER_LOCATION: gcr.io/gcp-autosocket/dyson:latest # default value
+  _CONTAINER_LOCATION: gcr.io/gcp-autosocket/autosocket:latest # default value
 steps:
   # [Build Dyson Container Image]
 - name: 'gcr.io/cloud-builders/docker'

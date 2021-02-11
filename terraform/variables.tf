@@ -17,6 +17,6 @@ variable "topic" {
 
 variable "container_location" {
     type        = string
-    default     = "gcr.io/jdnz-dyson-terraform1/dyson:latest"
+    default     = "gcr.io/gcp-autosocket/autosocket:latest"
     description = "Location of the container image" 
 }

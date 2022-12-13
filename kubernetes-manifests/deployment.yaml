@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dyson # {"$kpt-set":"app-name"}
+  namespace: dyson
+  labels:
+    app: dyson # {"$kpt-set":"app-name"}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dyson # {"$kpt-set":"app-name"} 
+  template:
+    metadata:
+      labels:
+        app: dyson # {"$kpt-set":"app-name"} 
+    spec:
+      serviceAccountName: dyson
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: cron
+        image: us-central1-docker.pkg.dev/jdnz-cloudrun-dev/ar-repo-us-central-1/cron:latest # {"$ref":"#/definitions/io.k8s.cli.substitutions.project-id-image"}
+        env:
+        - name: STREAM
+          valueFrom:
+            configMapKeyRef:
+              name: file-config
+              key: file
+        resources:
+          limits:
+            cpu: "300m"
+            memory: 400Mi
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        imagePullPolicy: Always
+        volumeMounts:
+          - name:  data
+            mountPath:  /data
+      - name: pulltop
+        securityContext:
+          allowPrivilegeEscalation: false
+        image: us-central1-docker.pkg.dev/jdnz-cloudrun-dev/ar-repo-us-central-1/dyson:latest # {"$ref":"#/definitions/io.k8s.cli.substitutions.project-id-image"}
+        env:
+        - name: SYMBOL
+          valueFrom:
+            configMapKeyRef:
+              name: topic-config
+              key: topic
+        - name: STREAM
+          valueFrom:
+            configMapKeyRef:
+              name: file-config
+              key: file
+        resources:
+          limits:
+            cpu: "300m"
+            memory: 400Mi
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        imagePullPolicy: Always
+        volumeMounts:
+          - name:  data
+            mountPath:  /data
+      - name: websocketd
+        securityContext:
+          allowPrivilegeEscalation: false
+        image: us-central1-docker.pkg.dev/jdnz-cloudrun-dev/ar-repo-us-central-1/websocketd
+        env:
+        - name: STREAM
+          valueFrom:
+            configMapKeyRef:
+              name: file-config
+              key: file
+        ports:
+        - protocol: TCP
+          containerPort: 8080
+        resources:
+          limits:
+            cpu: 500m
+            memory: 600Mi
+          requests:
+            cpu: 300m
+            memory: 312Mi
+        volumeMounts:
+          - name:  data
+            mountPath:  /data
+      volumes:
+        - name: data
+          emptyDir:
+            medium: Memory
+
+          
+        

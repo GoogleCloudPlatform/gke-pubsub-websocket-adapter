@@ -2,5 +2,14 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: topic-config
+  namespace: dyson
 data:
   topic: projects/pubsub-public-data/topics/taxirides-realtime # {"$kpt-set":"topic"}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: file-config
+  namespace: dyson
+data:
+  file: /data/output.json

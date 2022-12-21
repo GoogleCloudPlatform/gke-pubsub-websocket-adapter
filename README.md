@@ -22,7 +22,11 @@ and the following permissions:
 * A GKE cluster
 * A front-end load balancer 
 
-Out-of-the-box, `gke-pubsub-websocket-adapter` defaults to using the [NYC Taxi RIdes public
+#### CLI Tools (For the example):
+* KPT - [Installation Docs](https://kpt.dev/installation/kpt-cli)
+* Skaffold - [Installation Docs](https://skaffold.dev/docs/install/)
+
+Out-of-the-box, `gke-pubsub-websocket-adapter` defaults to using the [NYC Taxi Rides public
 topic](https://github.com/googlecodelabs/cloud-dataflow-nyc-taxi-tycoon) that is available to all GCP users. Please note that this
 topic's message rate can go escalate to 2500 messages per second or
 more at times.
@@ -67,10 +71,41 @@ WebSockets. These include:
 
 * [Cloud Build](https://github.com/GoogleCloudPlatform/gke-pubsub-websocket-adapter/blob/main/cloudbuild.yaml)
 * [Terraform](https://github.com/GoogleCloudPlatform/gke-pubsub-websocket-adapter/blob/main/setup/main.tf)
+* [kpt](https://github.com/GoogleCloudPlatform/gke-pubsub-websocket-adapter/blob/main/kubernetes-manifests/Kptfile)
+* [Skaffold](https://github.com/GoogleCloudPlatform/gke-pubsub-websocket-adapter/blob/main/skaffold.yaml)
 
 To deploy the `gke-pubsub-websocket-adapter` ensure you have set
-`gcloud config set project sample-project` to the project you wish to
-deploy the `gke-pubsub-websocket-adapter` in. After that you can run `sh deploy.sh` to deploy everything you need for a sample deployment using the public [NYC Taxi Rides feed](https://github.com/GoogleCloudPlatform/nyc-taxirides-stream-feeder) `projects/pubsub-public-data/topics/taxirides-realtime"` Pub/Sub topic. 
+`gcloud config set project my-project-id` to the project you wish to
+deploy the `gke-pubsub-websocket-adapter` in.
+
+First you will need to edit the `skaffold.yaml` config. 
+Update the following configuration files:
+
+skaffold.yaml
+* `my-project-id` to your GCP Project ID
+* `us-docker.pkg.dev/my-project-id/docker/` to the registry you wish to use, the terraform provided grants permissions for [Artifact Registry](https://cloud.google.com/artifact-registry).
+
+kubernetes-manifests/setters.yaml
+```
+image-repo: us-docker.pkg.dev/my-project-id/repo-name/
+project-id: my-project-id
+```
+
+After that you can run change directory to the example `cd examples/taxirides-realtime/` `sh deploy.sh` to deploy the infrastructure for sample deployment using the public [NYC Taxi Rides feed](https://github.com/GoogleCloudPlatform/nyc-taxirides-stream-feeder) `projects/pubsub-public-data/topics/taxirides-realtime"` Pub/Sub topic. 
+
+Once the terraform deployment is complete, you will need to get the credentials for the GKE cluster.
+
+```
+gcloud container clusters get-credentials dyson-cluster --region us-central1 --project my-project-id
+```
+
+Now you can deploy the workload by running `skaffold run` from the root of the directory.
+
+#### Clean up
+To clean up all of the resources created run the following:
+```
+cd examples/taxirides-realtime/setup && gcloud builds submit --config destroy.yaml
+```
 
 ### Authentication
 
@@ -80,12 +115,10 @@ The `gke-pubsub-websocket-adapter` uses [Workload Identity](https://cloud.google
 ## Configuration
 
 [kpt](https://googlecontainertools.github.io/kpt/)  is used for setting config for the Kubernetes manifests.
+[Skaffold](https://skaffold.dev/) is used to build, render and deploy the manifests.
 
-You can see the variables that can be set by running `kpt cfg list-setters .` from within the directory.
 
-For the default deploy, these variables are set for you in the `cloudbuild.yaml` file. If you would like to pass through a different topic for the example you can so by passing [substitution variables](https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values) into Cloudbuild. 
-
- `gcloud builds submit --config cloudbuild.yaml --substitutions=_DYSON_APP_NAME="demo-app",_DYSON_TOPIC="projects/sample/topic"`
+For the default deployment, these variables are set for you in the `kubernetes-manifests/setters.yaml` file. Please modify these, and these will be rended as a part of the Skaffold pipeline.
 
 
 ## Known issues and enhancements

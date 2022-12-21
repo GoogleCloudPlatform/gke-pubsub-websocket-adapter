@@ -54,3 +54,11 @@ resource "google_service_account" "dyson" {
   account_id   = "dyson-sa"
   display_name = "dyson-sa"
 }
+
+# Artifact Registry
+
+resource "google_artifact_registry_repository" "docker-repo" {
+  location      = "us"
+  repository_id = "docker"
+  format        = "DOCKER"
+}

@@ -1,0 +1,14 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: EnsureNameSubstring
+metadata:
+  name: my-config
+substring: -taxirides
+editMode: append
+additionalNameFields:
+  - version: v1
+    kind: Service
+    path: spec/selector/app
+  - group: networking.k8s.io
+    version: v1
+    kind: Ingress
+    path: spec/defaultBackend/service/name

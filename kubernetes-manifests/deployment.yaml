@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dyson # {"$kpt-set":"app-name"}
-  namespace: dyson
+  name: dyson-taxirides # kpt-set: dyson-${name}
   labels:
-    app: dyson # {"$kpt-set":"app-name"}
+    app: dyson-taxirides # kpt-set: dyson-${name}
+  namespace: dyson
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dyson # {"$kpt-set":"app-name"} 
+      app: dyson-taxirides # kpt-set: dyson-${name}
   template:
     metadata:
       labels:
-        app: dyson # {"$kpt-set":"app-name"} 
+        app: dyson-taxirides # kpt-set: dyson-${name}
     spec:
-      serviceAccountName: dyson
+      serviceAccountName: dyson-taxirides
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -23,59 +23,59 @@ spec:
         fsGroup: 1000
       containers:
       - name: cron
-        image: us-central1-docker.pkg.dev/jdnz-cloudrun-dev/ar-repo-us-central-1/cron:latest # {"$ref":"#/definitions/io.k8s.cli.substitutions.project-id-image"}
+        image: us-docker.pkg.dev/my-project-id/repo-name/cron:latest # kpt-set: ${image-repo}cron:latest
         env:
         - name: STREAM
           valueFrom:
             configMapKeyRef:
-              name: file-config
+              name: file-config-taxirides
               key: file
         resources:
           limits:
-            cpu: "300m"
+            cpu: 300m
             memory: 400Mi
           requests:
             cpu: 200m
             memory: 200Mi
         imagePullPolicy: Always
         volumeMounts:
-          - name:  data
-            mountPath:  /data
+        - name: data
+          mountPath: /data
       - name: pulltop
         securityContext:
           allowPrivilegeEscalation: false
-        image: us-central1-docker.pkg.dev/jdnz-cloudrun-dev/ar-repo-us-central-1/dyson:latest # {"$ref":"#/definitions/io.k8s.cli.substitutions.project-id-image"}
+        image: us-docker.pkg.dev/my-project-id/repo-name/dyson:latest # kpt-set: ${image-repo}dyson:latest
         env:
         - name: SYMBOL
           valueFrom:
             configMapKeyRef:
-              name: topic-config
+              name: topic-config-taxirides
               key: topic
         - name: STREAM
           valueFrom:
             configMapKeyRef:
-              name: file-config
+              name: file-config-taxirides
               key: file
         resources:
           limits:
-            cpu: "300m"
+            cpu: 300m
             memory: 400Mi
           requests:
             cpu: 200m
             memory: 200Mi
         imagePullPolicy: Always
         volumeMounts:
-          - name:  data
-            mountPath:  /data
+        - name: data
+          mountPath: /data
       - name: websocketd
         securityContext:
           allowPrivilegeEscalation: false
-        image: us-central1-docker.pkg.dev/jdnz-cloudrun-dev/ar-repo-us-central-1/websocketd
+        image: us-docker.pkg.dev/my-project-id/repo-name/websocketd:latest # kpt-set: ${image-repo}websocketd:latest
         env:
         - name: STREAM
           valueFrom:
             configMapKeyRef:
-              name: file-config
+              name: file-config-taxirides
               key: file
         ports:
         - protocol: TCP
@@ -88,12 +88,9 @@ spec:
             cpu: 300m
             memory: 312Mi
         volumeMounts:
-          - name:  data
-            mountPath:  /data
-      volumes:
         - name: data
-          emptyDir:
-            medium: Memory
-
-          
-        
+          mountPath: /data
+      volumes:
+      - name: data
+        emptyDir:
+          medium: Memory

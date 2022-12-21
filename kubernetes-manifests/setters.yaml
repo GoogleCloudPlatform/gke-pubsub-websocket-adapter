@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: setters-taxirides
+  annotations:
+    config.kubernetes.io/local-config: "true"
+data:
+  name: taxirides
+  topic: projects/pubsub-public-data/topics/taxirides-realtime
+  image-repo: us-docker.pkg.dev/my-project-id/repo-name/
+  project-id: my-project-id
+  service-account: dyson-sa

@@ -1,0 +1,10 @@
+timeout: 10800s
+steps:
+  # [Kick off Terraform deployment]
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "deploy-cluster"
+  dir: "setup"
+  args:
+  - "builds"
+  - "submit"
+  

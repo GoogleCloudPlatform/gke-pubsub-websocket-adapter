@@ -1,5 +1,9 @@
 FROM debian:bullseye as build
-RUN apt-get -y update && apt-get -y install git && apt-get -y install build-essential && apt-get -y install curl && apt-get install -y dumb-init
+RUN apt-get -y update \
+  && apt-get -y install git \
+  && apt-get -y install build-essential \
+  && apt-get -y install curl \
+  && apt-get install -y dumb-init
 WORKDIR /go/src/app
 RUN git clone https://github.com/joewalnes/websocketd.git
 WORKDIR /go/src/app/websocketd

@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dyson-taxirides # kpt-set: dyson-${name}
+  labels:
+    app: dyson-taxirides # kpt-set: dyson-${name}
+  namespace: dyson
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dyson-taxirides # kpt-set: dyson-${name}
+  template:
+    metadata:
+      labels:
+        app: dyson-taxirides # kpt-set: dyson-${name}
+    spec:
+      serviceAccountName: dyson-taxirides
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: cron
+        image: us-docker.pkg.dev/my-project-id/repo-name/cron:latest # kpt-set: ${image-repo}cron:latest
+        env:
+        - name: STREAM
+          valueFrom:
+            configMapKeyRef:
+              name: file-config-taxirides
+              key: file
+        resources:
+          limits:
+            cpu: 300m
+            memory: 400Mi
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      - name: pulltop
+        securityContext:
+          allowPrivilegeEscalation: false
+        image: us-docker.pkg.dev/my-project-id/repo-name/dyson:latest # kpt-set: ${image-repo}dyson:latest
+        env:
+        - name: SYMBOL
+          valueFrom:
+            configMapKeyRef:
+              name: topic-config-taxirides
+              key: topic
+        - name: STREAM
+          valueFrom:
+            configMapKeyRef:
+              name: file-config-taxirides
+              key: file
+        resources:
+          limits:
+            cpu: 300m
+            memory: 400Mi
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      - name: websocketd
+        securityContext:
+          allowPrivilegeEscalation: false
+        image: us-docker.pkg.dev/my-project-id/repo-name/websocketd:latest # kpt-set: ${image-repo}websocketd:latest
+        env:
+        - name: STREAM
+          valueFrom:
+            configMapKeyRef:
+              name: file-config-taxirides
+              key: file
+        ports:
+        - protocol: TCP
+          containerPort: 8080
+        resources:
+          limits:
+            cpu: 500m
+            memory: 600Mi
+          requests:
+            cpu: 300m
+            memory: 312Mi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        emptyDir:
+          medium: Memory

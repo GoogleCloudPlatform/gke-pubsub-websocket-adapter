@@ -1,0 +1,33 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+build:
+  artifacts:
+  - image: us-docker.pkg.dev/my-project-id/docker/dyson
+    context: pulltop
+    docker:
+      cacheFrom:
+      - us-docker.pkg.dev/my-project-id/docker/dyson
+  - image: us-docker.pkg.dev/my-project-id/docker/websocketd
+    context: websocketd
+    docker:
+      cacheFrom:
+      - us-docker.pkg.dev/my-project-id/docker/websocketd
+  - image: us-docker.pkg.dev/my-project-id/docker/cron
+    context: cron
+    docker:
+      cacheFrom:
+      - us-docker.pkg.dev/my-project-id/docker/cron
+  tagPolicy:
+    sha256: {}
+  googleCloudBuild:
+    projectId: my-project-id
+manifests:
+   kpt:
+      - kubernetes-manifests
+deploy:
+  kpt:
+    applyFlags:
+      - "--inventory-policy=adopt"
+      - "--install-resource-group"
+      - "--server-side"
+      - "--force-conflicts"

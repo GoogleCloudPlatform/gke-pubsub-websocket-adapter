@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dyson-taxirides
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+  labels:
+    app: dyson
+  namespace: dyson
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: dyson-taxirides
+  type: ClusterIP
